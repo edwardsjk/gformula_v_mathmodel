@@ -33,7 +33,7 @@ shinyServer(function(input, output, session) {
 	crudeModel <- reactive({
 		dat <- newData()
 		if(is.null(dat)) return(NULL)
-		lm(dat$y ~ dat$x + dat$z, family=binomial)
+		glm(dat$y ~ dat$x + dat$z, family=binomial)
 	})
 
 	stanModel <- reactive({
@@ -43,28 +43,36 @@ shinyServer(function(input, output, session) {
 		
 		vector[N] x;
 		vector[N] z;
-		vector[N] y;
+		int<lower=0,upper=1> y[N];
 		}
 		
 		parameters {
 		real b0;
 		real bx;
 		real bz;
-		real sigma;
 		}
 		model{
-		 vector[N] mu;
-		 sigma ~ inv_gamma(',input$sigmaparm, ',',input$sigmaparm,');
 		 b0 ~ normal(',input$b0mean,',', input$b0var,');
 		 bx ~ normal(',input$b1mean,',', input$b1var,');
 		 bz ~ normal(',input$b2mean,',', input$b2var,');
-		 mu <- b0  + bx * x + bz * z;
-		 y ~ normal(mu, sqrt(sigma));
+		 
+		 y ~ bernoulli_logit(b0 + bx * x + bz * z);
 		}
 		generated quantities{
 		  real fy;
-		  fy <- mean(b0  + bx * ',input$xset,' + bz * z);
-
+		  real fy0;
+		  real rd;
+		  real fyi[N];
+		  real fyi0[N];
+		  real or_x;
+		  for(n in 1:N){
+		  	fyi[n] <- inv_logit(b0 + bx * ',input$xset,' + bz * z[n]);
+		  	fyi0[n] <- inv_logit(b0 + bz * z[n]);
+		  }
+		  fy <- mean(fyi);
+		  fy0 <- mean(fyi0);
+		  rd <- fy-fy0;
+		  or_x <- exp(bx);
 		}')
 	})
 	
@@ -92,7 +100,7 @@ shinyServer(function(input, output, session) {
 		#stan code
 		stan(model_code = mod, data = datastan, 
 			iter=input$niterations, 
-			chains=input$nchains, pars=c("fy", "bx", "bz", "b0"), verbose=FALSE)
+			chains=input$nchains, pars=c("fy", "fy0", "rd", "or_x", "bx", "bz", "b0"), verbose=FALSE)
 	})
 	
 	getBayesresults <- reactive({
@@ -108,8 +116,9 @@ shinyServer(function(input, output, session) {
 		posterior <- getBayesresults()
 		if(is.null(posterior)) return(NULL)
 		df <- data.frame(apply(posterior, 2, function(x) c(mean=mean(x), std=sd(x), median=median(x), p=quantile(x, 0.025), p=quantile(x, 0.975))))
-		df$stat = rownames(df)
-	})
+		stat = rownames(df)
+		data.frame(cbind(stat, df))
+	}, options=list(digits=3))
 	
 	output$postPlot <- renderPlot({
 		posterior <- getBayesresults()

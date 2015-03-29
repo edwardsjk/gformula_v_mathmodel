@@ -11,11 +11,11 @@ shinyUI(fluidPage(
     sidebarPanel(
       h1("G-formula slider: Rstan"),
       h3("Priors"),
-      sliderInput("sigmaparm",
-                  "sigma: prior for scale parameter (inverse gamma parameters)",
-                  min = 0.0001,
-                  max = 10,
-                  value = 0.1),
+#      sliderInput("sigmaparm",
+#                  "sigma: prior for scale parameter (inverse gamma parameters)",
+#                  min = 0.0001,
+#                  max = 10,
+#                  value = 0.1),
       sliderInput("b0mean",
                   "beta_0: prior mean",
                   min = -20,
@@ -73,6 +73,17 @@ shinyUI(fluidPage(
     # Show a plot of the generated distribution
 	mainPanel(
 		tabsetPanel(
+			tabPanel("Quick start instructions",
+			br(),
+			p("0. Install 'shiny' and 'Rstan' packages in R"),
+			p("\n\n1. Download sample data from here: https://github.com/alexpkeil1/gformula_v_mathmodel/blob/master/data/testdata.csv"),
+			p("2. Go to logistic model tab"),
+			p("3. Upload data from step 1, be a little patient"),
+			p("4. Profit"),
+			p("5. Play around with priors, MCMC settings in left tab (better to do this before uploading data, once you have this figured out)")
+			
+			),
+			
     		tabPanel("Logistic model",
     			fileInput('indata', 'Upload data (csv, three bernoulli variables named x,y,z)', 
     				accept=c('text/csv','text/comma-separated-values,text/plain','.csv')),
@@ -82,11 +93,11 @@ shinyUI(fluidPage(
 				dataTableOutput("bayesmodData"),
 				h4("Prior and posterior distributions"),
 				fluidRow(
-					column(6,plotOutput("priorPlot", width=400, height=400)),
-					column(6, plotOutput("postPlot", width=400, height=400))
+					column(6,plotOutput("priorPlot", width=300, height=300)),
+					column(6, plotOutput("postPlot", width=300, height=300))
 					),
 				h4("Trace plots"),
-				plotOutput("tracePlot", width=800, height=400)
+				plotOutput("tracePlot", width=600, height=300)
     		),
     		tabPanel("Stan model, data",
     			fluidRow(

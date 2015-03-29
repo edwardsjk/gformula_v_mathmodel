@@ -1,0 +1,5 @@
+# System files #
+.DS_Store
+
+# R data files #
+*.RData
