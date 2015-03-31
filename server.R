@@ -146,14 +146,14 @@ shinyServer(function(input, output, session) {
 			posterior <- getBayesresults()
 			if(is.null(posterior)) return(NULL)
 			par(mfrow=c(1,3))
-			barplot(c(posterior$cnat, posterior$cint))
+			barplot(c(mean(posterior$cnat), mean(posterior$cint)),names.arg=c("Natural Course", "Intervention"), col=c("blue", "green"))
 	})
 
 	output$riskPlot <- renderPlot({
 			posterior <- getBayesresults()
 			if(is.null(posterior)) return(NULL)
 			par(mfrow=c(1,3))
-			barplot(c(mean(posterior$fynat), mean(posterior$fyint)))
+			barplot(c(mean(posterior$fynat), mean(posterior$fyint)), names.arg=c("Natural Course", "Intervention"), col=c("blue", "green"))
 	})
 
 	output$tracePlot <- renderPlot({
