@@ -81,8 +81,8 @@ shinyServer(function(input, output, session) {
 		  fy0 <- mean(fyi0);
 		  rd <- fyint-fynat;
 		  or_x <- exp(bx);
-		  cnat <- sum(costn);
-		  cint <- sum(costi);
+		  cnat <- mean(costn);
+		  cint <- mean(costi);
 		}')
 	})
 
