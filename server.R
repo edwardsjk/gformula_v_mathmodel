@@ -61,7 +61,7 @@ shinyServer(function(input, output, session) {
 		generated quantities{
 		  real fyint;
 		  real fy0;
-		  real fynat
+		  real fynat;
 		  real rd;
 		  real fyi[N];
 		  real fyn[N];
