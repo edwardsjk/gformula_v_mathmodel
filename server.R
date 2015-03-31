@@ -148,10 +148,10 @@ shinyServer(function(input, output, session) {
 			par(mfrow=c(1,3))
 			#barplot(c(mean(posterior$cnat), mean(posterior$cint)),names.arg=c("NC", "INT"), col=c("blue", "green"))
 
-			a <- as.numeric(rbind(mean(posterior$cint), mean(posterior$cnat)))
-			b <- as.numeric(rbind(sd(posterior$cint), sd(posterior$cnat)))
+			a <- rbind(mean(posterior$cint), mean(posterior$cnat))
+			b <- rbind(sd(posterior$cint), sd(posterior$cnat))
 			c <- rbind("Natural Course", "Intervention")
-			d <- as.data.frame(cbind(a,b,c)) #fix here
+			d <- as.data.frame(cbind(as.numeric(a),as.numeric(b),c)) #fix here
 			ggplot(d, aes(x=V3, y=V1))+geom_bar(stat="identity", position="dodge", fill=c("lightblue", "darkblue"))+
 			geom_errorbar(aes(ymin=V1-1.96*V2, ymax=V1+1.96*V2), width=0.3, color="black")
 	})
