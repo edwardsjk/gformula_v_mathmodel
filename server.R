@@ -153,7 +153,7 @@ shinyServer(function(input, output, session) {
 			posterior <- getBayesresults()
 			if(is.null(posterior)) return(NULL)
 			par(mfrow=c(1,3))
-			barplot(c(posterior$fynat, posterior$fyint))
+			barplot(c(mean(posterior$fynat), mean(posterior$fyint)))
 	})
 
 	output$tracePlot <- renderPlot({
