@@ -68,6 +68,8 @@ shinyServer(function(input, output, session) {
 		  real fyi0[N];
 		  real costn[N];
 	      real costi[N];
+		  real cnat;
+		  real cint;
 		  real or_x;
 		  for(n in 1:N){
 			fyn[n] <- inv_logit(b0 + bx * x[n] + bz * z[n]);
@@ -81,8 +83,8 @@ shinyServer(function(input, output, session) {
 		  fy0 <- mean(fyi0);
 		  rd <- fyint-fynat;
 		  or_x <- exp(bx);
-		  cnat <- mean(costn);
-		  cint <- mean(costi);
+		  cnat <- sum(costn);
+		  cint <- sum(costi);
 		}')
 	})
 
