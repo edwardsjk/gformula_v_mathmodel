@@ -70,7 +70,7 @@ shinyUI(fluidPage(
       			   max=100000000,
       			   value=1,
       			   step=1
-      				)
+      				),
       numericInput("ycost",
       			   "Cost of Y:",
       			   min=0,
