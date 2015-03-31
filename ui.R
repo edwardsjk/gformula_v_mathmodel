@@ -62,7 +62,7 @@ shinyUI(fluidPage(
       			   max=1,
       			   value=1,
       			   step=1
-      				)
+      				),
       h3("Utilities"),
       numericInput("xcost",
       			   "Cost of X:",
