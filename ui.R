@@ -63,6 +63,21 @@ shinyUI(fluidPage(
       			   value=1,
       			   step=1
       				)
+      h4("Utilities"),
+      numericInput("xcost",
+      			   "Cost of X:",
+      			   min=0,
+      			   max=100000000,
+      			   value=1,
+      			   step=1
+      				)
+      numericInput("ycost",
+      			   "Cost of Y:",
+      			   min=0,
+      			   max=100000000,
+      			   value=1,
+      			   step=1
+      				)
     ),
 
     # Show a plot of the generated distribution
@@ -76,11 +91,11 @@ shinyUI(fluidPage(
 			p("3. Upload data from step 1, be a little patient"),
 			p("4. Profit"),
 			p("5. Play around with priors, MCMC settings in left tab (better to do this before uploading data, once you have this figured out)")
-			
+
 			),
-			
+
     		tabPanel("Logistic model",
-    			fileInput('indata', 'Upload data (csv, three bernoulli variables named x,y,z)', 
+    			fileInput('indata', 'Upload data (csv, three bernoulli variables named x,y,z)',
     				accept=c('text/csv','text/comma-separated-values,text/plain','.csv')),
     			h4("Frequentist results"),
 				tableOutput("crudemodData"),

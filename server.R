@@ -25,11 +25,11 @@ shinyServer(function(input, output, session) {
 		curve(dnorm(x, input$b0mean, input$b0var), xlim=lim1, xlab="b0")
 		curve(dnorm(x, input$b1mean, input$b1var), xlim=lim1, xlab="bx")
 		curve(dnorm(x, input$b2mean, input$b2var), xlim=lim1, xlab="bz")
-		
+
 	})
 
-	
-	
+
+
 	crudeModel <- reactive({
 		dat <- newData()
 		if(is.null(dat)) return(NULL)
@@ -40,12 +40,12 @@ shinyServer(function(input, output, session) {
 		paste0(
 		'data {
 		int<lower=0> N;
-		
+
 		vector[N] x;
 		vector[N] z;
 		int<lower=0,upper=1> y[N];
 		}
-		
+
 		parameters {
 		real b0;
 		real bx;
@@ -55,41 +55,51 @@ shinyServer(function(input, output, session) {
 		 b0 ~ normal(',input$b0mean,', sqrt(', input$b0var,'));
 		 bx ~ normal(',input$b1mean,', sqrt(', input$b1var,'));
 		 bz ~ normal(',input$b2mean,',sqrt(', input$b2var,'));
-		 
+
 		 y ~ bernoulli_logit(b0 + bx * x + bz * z);
 		}
 		generated quantities{
-		  real fy;
+		  real fyint;
 		  real fy0;
+		  real fynat
 		  real rd;
 		  real fyi[N];
+		  real fyn[N];
 		  real fyi0[N];
+		  real costn[N];
+	      real costi[N];
 		  real or_x;
 		  for(n in 1:N){
+			fyn[n] <- inv_logit(b0 + bx * x[n] + bz * z[n]);
 		  	fyi[n] <- inv_logit(b0 + bx * ',input$xset,' + bz * z[n]);
 		  	fyi0[n] <- inv_logit(b0 + bz * z[n]);
+			costn[n] <- x[n] * ', input$xcost,'+ fyn[n] * ', input$ycost,';
+			costi[n] <- ',input$xset,' * ', input$xcost,'+ fyi[n] * ', input$ycost,';
 		  }
-		  fy <- mean(fyi);
+		  fynat <- mean(fyn);
+		  fyint <- mean(fyi);
 		  fy0 <- mean(fyi0);
-		  rd <- fy-fy0;
+		  rd <- fyint-fynat;
 		  or_x <- exp(bx);
+		  cnat <- sum(costn);
+		  cint <- sum(costi);
 		}')
 	})
-	
+
 
 	stanData <- reactive({
 		dat <- newData()
 		if(is.null(dat)) return(NULL)
 		list(N=length(dat$x), x=dat$x, y=dat$y, z=dat$z)
 	})
-	
+
 	output$stanDatatext <- renderText({
 		stanModel()
 	})
 	output$stanModtext <- renderText({
 		stanModel()
 	})
-	
+
 	bayesModel <- reactive({
 		dat <- newData()
 		if(is.null(dat)) return(NULL)
@@ -98,17 +108,17 @@ shinyServer(function(input, output, session) {
 		#data
 		datastan <- stanData()
 		#stan code
-		stan(model_code = mod, data = datastan, 
-			iter=input$niterations, 
-			chains=input$nchains, pars=c("fy", "fy0", "rd", "or_x", "bx", "bz", "b0"), verbose=FALSE)
+		stan(model_code = mod, data = datastan,
+			iter=input$niterations,
+			chains=input$nchains, pars=c("fynat", "fyint", "fy0", "rd", "or_x", "bx", "bz", "b0", "cnat", "cint"), verbose=FALSE)
 	})
-	
+
 	getBayesresults <- reactive({
 		mod <- bayesModel()
 		if(is.null(mod)) return(NULL)
 		data.frame(extract(mod))
 	})
-	
+
 	output$crudemodData <- renderTable({
 		crudeModel()
 	})
@@ -119,7 +129,7 @@ shinyServer(function(input, output, session) {
 		stat = rownames(df)
 		data.frame(cbind(stat, df))
 	}, options=list(digits=3))
-	
+
 	output$postPlot <- renderPlot({
 		posterior <- getBayesresults()
 		if(is.null(posterior)) return(NULL)
@@ -128,6 +138,23 @@ shinyServer(function(input, output, session) {
 		plot(density(posterior$bx))
 		plot(density(posterior$bz))
 	})
+
+	output$costPlot <- renderPlot({
+			posterior <- getBayesresults()
+			if(is.null(posterior)) return(NULL)
+			par(mfrow=c(1,3))
+			plot(density(posterior$cnat))
+			plot(density(posterior$cint))
+	})
+
+	output$riskPlot <- renderPlot({
+			posterior <- getBayesresults()
+			if(is.null(posterior)) return(NULL)
+			par(mfrow=c(1,3))
+			plot(density(posterior$fynat))
+			plot(density(posterior$fyint))
+	})
+
 	output$tracePlot <- renderPlot({
 		posterior <- getBayesresults()
 		if(is.null(posterior)) return(NULL)
