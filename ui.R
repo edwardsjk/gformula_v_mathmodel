@@ -106,6 +106,11 @@ shinyUI(fluidPage(
 					column(6,plotOutput("priorPlot", width=300, height=300)),
 					column(6, plotOutput("postPlot", width=300, height=300))
 					),
+                h4("Risks and Costs"),
+    				fluidRow(
+    					column(6,plotOutput("riskPlot", width=300, height=300)),
+    					column(6, plotOutput("costPlot", width=300, height=300))
+    					),
 				h4("Trace plots"),
 				plotOutput("tracePlot", width=600, height=300)
     		),
