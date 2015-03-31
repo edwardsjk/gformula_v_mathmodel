@@ -141,22 +141,19 @@ shinyServer(function(input, output, session) {
 		plot(density(posterior$bz))
 	})
 
-	costs <- c(posterior$cnat, posterior$cint)
-
-	risks <- c(posterior$fynat, posterior$fyint)
 
 	output$costPlot <- renderPlot({
 			posterior <- getBayesresults()
 			if(is.null(posterior)) return(NULL)
 			par(mfrow=c(1,3))
-			barplot(costs)
+			barplot(c(posterior$cnat, posterior$cint))
 	})
 
 	output$riskPlot <- renderPlot({
 			posterior <- getBayesresults()
 			if(is.null(posterior)) return(NULL)
 			par(mfrow=c(1,3))
-			barplot(risks)
+			barplot(c(posterior$fynat, posterior$fyint))
 	})
 
 	output$tracePlot <- renderPlot({
