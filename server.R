@@ -146,14 +146,20 @@ shinyServer(function(input, output, session) {
 			posterior <- getBayesresults()
 			if(is.null(posterior)) return(NULL)
 			par(mfrow=c(1,3))
-			barplot(c(mean(posterior$cnat), mean(posterior$cint)),names.arg=c("Natural Course", "Intervention"), col=c("blue", "green"))
+			#barplot(c(mean(posterior$cnat), mean(posterior$cint)),names.arg=c("NC", "INT"), col=c("blue", "green"))
+			a <- rbind(mean(posterior$cnat), mean(posterior$cint))
+			b <- rbind(sd(posterior$cnat), sd(posterior$cint))
+			c <- rbind("Natural Course", "Intervention")
+			d <- as.data.frame(cbind(a,b,c))
+			ggplot(d, aes(x=V3, y=V1))+geom_bar(stat="identity", position="dodge", fill=c("lightblue", "darkblue"))+
+			geom_errorbar(aes(ymin=V1-1.96*V2, ymax=V1+1.96*V2), width=0.3, color="black")
 	})
 
 	output$riskPlot <- renderPlot({
 			posterior <- getBayesresults()
 			if(is.null(posterior)) return(NULL)
 			par(mfrow=c(1,3))
-			barplot(c(mean(posterior$fynat), mean(posterior$fyint)), names.arg=c("Natural Course", "Intervention"), col=c("blue", "green"))
+			barplot(c(mean(posterior$fynat), mean(posterior$fyint)), names.arg=c("NC", "INT"), col=c("blue", "green"))
 	})
 
 	output$tracePlot <- renderPlot({
